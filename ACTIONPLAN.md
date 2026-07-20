@@ -2,13 +2,6 @@
 
 ## Phase 1: Environment setup & toolchain configuration
 
-### 1.1 Project initialization
-
-1. Create a Node.js dev container to encapsulate all development tools.
-2. Initialize a clean Node.js project.
-3. Configure the project to use ECMAScript Modules (`"type": "module"`)
-   within `package.json`.
-
 ### 1.2 Dependency management
 
 Install the absolute minimum production and development packages to
@@ -30,13 +23,6 @@ prevent ecosystem fragmentation and code bloat:
     consistency automatically.
   * `tsup`: A zero-config bundler to package the application into a
     single executable JavaScript file for distribution.
-
-### 1.3 TypeScript optimization
-
-Configure `tsconfig.json` targeting modern Node.js environments
-(`NodeNext` module resolution, strict type checking enabled, and modern
-syntax compilation targets) to eliminate standard compilation
-boilerplate.
 
 ## Phase 2: Core architecture & ACP client implementation
 

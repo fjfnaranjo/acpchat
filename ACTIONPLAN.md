@@ -1,28 +1,22 @@
 # acpchat action plan
 
-## Phase 1: Environment setup & toolchain configuration
+## Phase 1: Dependency consideration
 
-### 1.2 Dependency management
-
-Install the absolute minimum production and development packages to
-prevent ecosystem fragmentation and code bloat:
-
-* **Production Dependencies:**
-  * `@modelcontextprotocol/sdk`: For standardized JSON-RPC framing and
-    ACP protocol streaming.
-  * `commander`: For handling robust, structured command-line arguments.
-  * `zod`: For strict, runtime data validation of asynchronous JSON
-    payloads from the agent.
-  * `marked`: For parsing text stream Markdown into structural tokens.
-  * `chalk`: For basic, high-contrast terminal styling attributes.
-* **Development Dependencies:**
-  * `typescript`: The compiler core.
-  * `tsx`: For zero-compilation execution of TypeScript files directly
-    during development.
-  * `eslint` & `prettier`: To enforce strict linting rules and format
-    consistency automatically.
-  * `tsup`: A zero-config bundler to package the application into a
-    single executable JavaScript file for distribution.
+* `@modelcontextprotocol/sdk`: For standardized JSON-RPC framing and
+ ACP protocol streaming.
+  * Validate if an specific ACP sdk exists.
+* `zod`: For strict, runtime data validation of asynchronous JSON
+ payloads from the agent.
+  * Needed? I don't think so... The ACP sdk should have the protocol
+    types already.
+* `marked`: For parsing text stream Markdown into structural tokens.
+  * Valuable for analysing the stream contents and detect full blocks,
+    italics and bold.
+* `chalk`: For basic, high-contrast terminal styling attributes.
+  * Probably not if the only thing I need are italic and bold. Extract
+    code from https://github.com/sindresorhus/yoctocolors instead. Grey?
+    A couple of extra color to distinguish text origin
+    (acpchat/agent/errors...).
 
 ## Phase 2: Core architecture & ACP client implementation
 

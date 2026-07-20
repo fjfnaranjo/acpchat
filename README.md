@@ -28,10 +28,10 @@ standard `stdout`.
 ## Getting started
 
 Launch `acpchat` by supplying the command required to instantiate your
-background agent server via the `--agent` parameter:
+background agent server (from the basic application parameters):
 
 ```sh
-acpchat --agent "headless-agent-engine --stdio"
+acpchat headless-agent-engine --stdio
 ```
 
 ### Control directives

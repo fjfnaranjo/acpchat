@@ -9,7 +9,7 @@ Integration tests spin up `acpchat` against a mocked ACP agent
 reference text, relying in `stdout` / `stdin` redirections.
 
 ```sh
-tsx src/index.ts --agent bin/mock-agent.ts \
+tsx src/index.ts bin/mock-agent.ts \
     < test/fixtures/scenario-script.txt > test/output.log
 ```
 

@@ -5,8 +5,15 @@
   "bin": {
     "appchat": "./dist/index.js"
   },
+  "scripts": {
+    "format": "prettier --write 'src/**/*.ts'",
+    "lint": "eslint 'src/**/*.ts'"
+  },
   "devDependencies": {
+    "eslint": "^10.0.0",
+    "prettier": "^3.0.0",
     "tsx": "^4.0.0",
-    "typescript": "^6.0.0"
+    "typescript": "^6.0.0",
+    "typescript-eslint": "^8.0.0"
   }
 }

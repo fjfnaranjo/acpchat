@@ -35,14 +35,16 @@ export class CLI {
   private enableRawMode(): void {
     stdin.setRawMode(true);
     stdin.resume();
-    this.keypressHandler = (_str, key) => {
-      if (key.name === "escape" || (key.ctrl && key.name === "c")) {
-        this.state = CLIState.INTERRUPTED;
-        this.disableRawMode();
-        this.promptHandler();
-      }
-    };
-    stdin.on("keypress", this.keypressHandler);
+    if (!this.keypressHandler) {
+      this.keypressHandler = (_str, key) => {
+        if (key.name === "escape" || (key.ctrl && key.name === "c")) {
+          this.state = CLIState.INTERRUPTED;
+          this.disableRawMode();
+          this.promptHandler();
+        }
+      };
+      stdin.on("keypress", this.keypressHandler);
+    }
   }
 
   private disableRawMode(): void {
@@ -51,7 +53,6 @@ export class CLI {
       this.keypressHandler = null;
     }
     stdin.setRawMode(false);
-    stdin.pause();
   }
 
   private promptHandler() {
@@ -66,7 +67,12 @@ export class CLI {
       }
 
       const rl = createInterface({ input: stdin, output: stdout });
-      let on_prompt: Boolean = true;
+
+      rl.on("SIGINT", () => {
+        // TODO: Handle interruption
+      });
+
+      let on_prompt: boolean = true;
       while (on_prompt) {
         const command = await rl.question(promptSymbol);
         const full_command = command.trim();

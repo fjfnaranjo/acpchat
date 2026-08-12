@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { argv, stdin, stderr, exit } from "node:process";
-import { CLI } from "./cli.js";
+import { Session } from "./session.js";
 
 if (!stdin.isTTY) {
   stderr.write("STDIN is not a TTY.\n");
@@ -13,4 +13,4 @@ if (!acp_cmd) {
   exit(1);
 }
 
-new CLI(acp_cmd, acp_args);
+new Session(acp_cmd, acp_args).run();

@@ -11,7 +11,7 @@ shell:
 
 .PHONY: acpchat
 acpchat:
-	@$(PODMAN_RUN) npx tsx src/index.ts
+	@$(PODMAN_RUN) npx tsx src/main.ts
 
 .PHONY: format
 format:

@@ -21,7 +21,7 @@ Context Protocol (MCP) data servers.
 ## Project Structure
 
 * `src/`.
-  * `index.ts`: Entry point, CLI flags, main app loop.
+  * `main.ts`: Entry point, CLI flags, main app loop.
   * `connection.ts`: JSON-RPC process and ACP session binding managers.
   * `interface.ts`: readline UI loops, alerts, and authorization gates.
   * `stream.ts`: Markdown tokenization and stream sanitization.

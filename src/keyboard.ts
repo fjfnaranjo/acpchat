@@ -4,28 +4,34 @@ import { createInterface } from "node:readline/promises";
 
 type KeyHandler = (str: string, key: Key) => void;
 
-export class Terminal {
+export class Keyboard {
   private keypressHandler: KeyHandler | null = null;
 
   constructor() {
     emitKeypressEvents(stdin);
   }
 
-  enterStreamingMode(onEnter: () => void) {
+  wait(onShowPrompt: () => void, onInterrupt: () => void) {
     stdin.setRawMode(true);
     stdin.resume();
     this.attachKeypress((_str, key) => {
-      if (key && key.name === "return") {
-        this.detachKeypress();
-        onEnter();
+      if (key) {
+        if (key.name === "return") {
+          this.detachKeypress();
+          onShowPrompt();
+        }
+        if (key.name === "escape" || (key.ctrl && key.name === "c")) {
+          this.detachKeypress();
+          onInterrupt();
+        }
       }
     });
   }
 
   async readLine(
     prompt: string,
-    onAbort: () => void,
-    onSIGINT: () => void,
+    onHidePrompt: () => void,
+    onInterrupt: () => void,
   ): Promise<string> {
     const rl = createInterface({ input: stdin, output: stdout });
     const ac = new AbortController();
@@ -38,13 +44,13 @@ export class Terminal {
     rl.on("SIGINT", () => {
       this.detachKeypress();
       rl.close();
-      onSIGINT();
+      onInterrupt();
     });
 
     try {
       return await rl.question(prompt, { signal: ac.signal });
     } catch {
-      onAbort();
+      onHidePrompt();
       return "";
     } finally {
       this.detachKeypress();

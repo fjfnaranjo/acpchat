@@ -7,10 +7,10 @@ if (!stdin.isTTY) {
   exit(1);
 }
 
-const [acp_cmd, ...acp_args] = argv.slice(2);
-if (!acp_cmd) {
+const [command, ...args] = argv.slice(2);
+if (!command) {
   stderr.write("Missing ACP server command.\n");
   exit(1);
 }
 
-new Session(acp_cmd, acp_args).run();
+new Session(command, args).run();

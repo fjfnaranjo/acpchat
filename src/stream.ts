@@ -1,6 +1,6 @@
 import { stdout } from "node:process";
 
-export class ChunkBuffer {
+export class Stream {
   private chunks: Buffer[] = [];
   private streaming: boolean = true;
 
@@ -23,7 +23,7 @@ export class ChunkBuffer {
     }
   }
 
-  get bufferedCount(): number {
-    return this.chunks.length;
+  get hasChunks(): boolean {
+    return this.chunks.length > 0;
   }
 }

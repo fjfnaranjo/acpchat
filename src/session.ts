@@ -1,30 +1,32 @@
 import { stdin, stderr, exit } from "node:process";
-import { AgentProcess } from "./agent.js";
-import { ChunkBuffer } from "./output.js";
-import { Terminal } from "./prompt.js";
+import { Stream } from "./stream.js";
+import { Keyboard } from "./keyboard.js";
+import { ACPProcess } from "./acp-process.js";
 
-enum SessionState {
-  STREAMING = "STREAMING",
+enum PromptMode {
+  HIDDEN = "HIDDEN",
   INTERRUPTED = "INTERRUPTED",
 }
 
 export class Session {
-  private state: SessionState = SessionState.STREAMING;
-  private agent: AgentProcess;
-  private buffer: ChunkBuffer;
-  private terminal: Terminal;
+  private prompt_mode: PromptMode = PromptMode.HIDDEN;
+  private stream: Stream;
+  private keyboard: Keyboard;
+  private acp_process: ACPProcess;
 
   constructor(command: string, args: string[]) {
-    this.agent = new AgentProcess(command, args);
-    this.buffer = new ChunkBuffer();
-    this.terminal = new Terminal();
-
-    this.agent.onChunk((chunk) => this.buffer.push(chunk));
-    this.agent.onClose((code) => this.cleanupAndExit(code));
-    this.agent.onError((err) => {
-      stderr.write(`Failed to execute ACP command: ${err.message}\n`);
-      this.cleanupAndExit(-1);
-    });
+    this.stream = new Stream();
+    this.keyboard = new Keyboard();
+    this.acp_process = new ACPProcess(
+      command,
+      args,
+      (chunk) => this.stream.push(chunk),
+      (code) => this.cleanupAndExit(code),
+      (err) => {
+        stderr.write(`Failed to execute ACP command: ${err.message}\n`);
+        this.cleanupAndExit(-1);
+      },
+    );
   }
 
   run() {
@@ -32,34 +34,40 @@ export class Session {
   }
 
   private enterStreaming() {
-    this.state = SessionState.STREAMING;
-    this.buffer.setStreaming(true);
-    this.terminal.enterStreamingMode(() => {
-      this.state = SessionState.INTERRUPTED;
-      this.buffer.setStreaming(false);
-      void this.promptLoop();
-    });
+    this.prompt_mode = PromptMode.HIDDEN;
+    this.stream.setStreaming(true);
+    this.keyboard.wait(
+      () => {
+        this.prompt_mode = PromptMode.INTERRUPTED;
+        this.stream.setStreaming(false);
+        void this.showPrompt();
+      },
+      () => {
+        // TODO: Replace by ACP cancel
+        this.cleanupAndExit();
+      },
+    );
   }
 
-  private async promptLoop() {
+  private async showPrompt() {
     let on_prompt = true;
     while (on_prompt) {
-      const command = await this.terminal.readLine(
+      const command = await this.keyboard.readLine(
         this.makePrompt(),
         () => {
-          this.buffer.flush();
+          this.stream.flush();
           on_prompt = false;
         },
-        () => this.cleanupAndExit(0),
+        () => this.cleanupAndExit(),
       );
 
       switch (command.trim()) {
         case "/quit":
         case "/exit":
-          this.cleanupAndExit(0);
+          this.cleanupAndExit();
           break;
         case "/continue":
-          this.buffer.flush();
+          this.stream.flush();
           on_prompt = false;
           break;
         default:
@@ -70,8 +78,8 @@ export class Session {
   }
 
   private makePrompt(): string {
-    if (this.state === SessionState.INTERRUPTED) {
-      if (this.buffer.bufferedCount > 1) {
+    if (this.prompt_mode === PromptMode.INTERRUPTED) {
+      if (this.stream.hasChunks) {
         return "[echo] > ";
       } else {
         return "[int] > ";
@@ -81,9 +89,10 @@ export class Session {
     }
   }
 
-  private cleanupAndExit(code: number) {
-    this.buffer.flush();
-    // TODO: Handle ACP state when quit is requested
+  private cleanupAndExit(code: number = 0) {
+    // TODO: Verify if the agent is still running
+    // this.acp_process.kill();
+    this.stream.flush();
     stdin.setRawMode(false);
     exit(code);
   }

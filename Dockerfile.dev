@@ -1,0 +1,2 @@
+FROM node:lts-alpine
+RUN npm i -g opencode-ai --allow-scripts=opencode-ai

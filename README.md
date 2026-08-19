@@ -1,7 +1,6 @@
 # acpchat
 
-> NOTE: This is a vibe-designed WIP mess... You should probably ignore
-> it for now...
+⚠️ WIP: This project is currently under its initial development phase.
 
 A pure stream-oriented (TUI-Free), text-only Agent Client Protocol (ACP)
 CLI client designed with consideration for users of screen readers and
@@ -11,43 +10,40 @@ terminal refresh displays.
 background re-renders, and visual frame layouts of traditional Text User
 Interfaces (TUIs). It flattens structural layouts and streams agent
 interactions as a predictable, chronological, text-only stream via
-standard `stdout`.
+standard _stdout_.
 
 ## Key design principles
 
-* **No screen overwriting:** Doesn't clear lines or alter historical
-  terminal rows. Text only flows downward.
-* **Basic system bindings:** Relies exclusively on readline-style
-  text input and entry modification.
-* **Linear layout rendering:** Dynamically linearises and converts
+* **Text only flows downward:** Doesn't clear lines or alter historical
+  terminal rows. Interfaces to choose options show a list of numbered
+  options and prompt for the number. No text scroll support. ¹
+* **Basic system bindings:** Heavily relies on readline text-input and
+  entry modification.
+* **ANSI formatting backend:** Dynamically linearises and converts
   Markdown into text strings or broadly supported ANSI escape sequences.
 * **Decoupled architecture:** Acts strictly as a lean ACP Client. It
-  leaves tool execution, lifecycle state, and Model Context Protocol
+  leaves tool execution, life-cycle state, and Model Context Protocol
   (MCP) host orchestration entirely to the backend agent harness.
+* **No session support:** Each program invocation creates its own
+  session. ¹
+
+¹ Want support for text scroll and sessions? Use a terminal multiplexer
+that integrates well with your terminal environment and supports
+sessions or a full UI terminal that provides this features.
 
 ## Getting started
 
 Launch `acpchat` by supplying the command required to instantiate your
-background agent server (from the basic application parameters):
+background agent server:
 
 ```sh
 acpchat headless-agent-engine --stdio
 ```
 
-### Control directives
+## Usage
 
-`acpchat` captures runtime configuration updates via explicit slash
-commands before they pass to the engine pipeline. These command
-interfaces present clean, non-interactive numbered selections instead of
-visual fuzzy matchers:
+See [SESSION.md](docs/SESSION.md).
 
-* `/model` — Opens a linear text list to update the active engine LLM.
-* `/provider` — Opens a linear option list to switch model orchestration
-  backends.
-* `//` - Allows sending a literal '/' to the backend agent.
-* `/quit`, `/exit` - Kills the session.
+## Contributing
 
-Some keyboard interrupts are also supported at any time:
-
-* `Ctrl-C` - Cancel pending tasks.
-* `Ctrl-D` - Cancel pending tasks and kills the session.
+See [CONTRIBUTING.md](docs/CONTRIBUTING.md).
